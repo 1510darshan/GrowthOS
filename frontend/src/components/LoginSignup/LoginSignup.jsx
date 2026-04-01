@@ -1,16 +1,37 @@
 import { useState } from "react";
 import "./LoginSignup.css";
+import { Register, Login } from "../../Services/Auth";
 
 export default function LoginSignup({ onClose }) {
   const [tab, setTab] = useState("login");
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Plug in your auth logic here
-    onClose && onClose();
+    setError("");
+
+    try {
+      let data;
+      if (tab === "login") {
+        data = await Login({ email: form.email, password: form.password });
+      } else {
+        data = await Register({ displayName: form.name, email: form.email, password: form.password });
+      }
+
+      if (data.success) {
+        localStorage.setItem("gos_token", data.data.token);
+        localStorage.setItem("gos_user", JSON.stringify(data.data.user));
+        onClose && onClose();
+      } else {
+        setError(data.error || "Something went wrong");
+      }
+    } catch (err) {
+      const msg = err.response?.data?.error || err.response?.data?.message || err.message || "Something went wrong";
+      setError(msg);
+    }
   };
 
   return (
@@ -43,6 +64,8 @@ export default function LoginSignup({ onClose }) {
           <button className={`auth-tab ${tab === "login" ? "active" : ""}`} onClick={() => setTab("login")}>Log in</button>
           <button className={`auth-tab ${tab === "signup" ? "active" : ""}`} onClick={() => setTab("signup")}>Sign up</button>
         </div>
+
+        {error && <div className="auth-error">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           {tab === "signup" && (
