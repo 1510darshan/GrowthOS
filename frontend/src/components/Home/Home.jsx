@@ -483,15 +483,15 @@ export default function Home() {
                                 <GrowthIllustration />
 
                                 <div className="hero-top">
-                                    <div className="hero-eyebrow">
+                                    {/* <div className="hero-eyebrow">
                                         <span className="pulse-dot" />
                                         Autonomous Growth Operating System
-                                    </div>
+                                    </div> */}
 
                                     <h1 className="hero-title">
                                         Your business,<br />
                                         <em>always growing.</em>
-                                        <span className="line2">Zero social media manager needed.</span>
+                                        {/* <span className="line2">Zero social media manager needed.</span> */}
                                     </h1>
 
                                     <p className="hero-desc">
