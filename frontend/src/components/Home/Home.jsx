@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./Home.css";
 import LoginSignup from "../LoginSignup/LoginSignup";
+import BusinessBrain from "../BusinessBrain/BusinessBrain";
 
 
 /* ══════════════════════════════════════════
@@ -524,7 +525,8 @@ export default function Home() {
                         )}
 
                         {/* Module Panel */}
-                        {showModule && !showChat && (
+                        {activeModule === "business-brain" && !showChat && <BusinessBrain />}
+                        {showModule && activeModule !== "business-brain" && !showChat && (
                             <ModulePanel moduleId={activeModule} onNavigate={setActiveModule} />
                         )}
 
