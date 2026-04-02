@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import LoginSignup from "../LoginSignup/LoginSignup";
-import BusinessBrain from "../BusinessBrain/BusinessBrain";
-
 
 /* ══════════════════════════════════════════
-   NAV MODULES — all 7 features from problem 1
+   NAV MODULES
 ══════════════════════════════════════════ */
 const NAV_MODULES = [
     {
@@ -14,6 +13,7 @@ const NAV_MODULES = [
         name: "Home",
         desc: "Dashboard overview",
         section: "workspace",
+        path: "/",
     },
     {
         id: "business-brain",
@@ -22,6 +22,7 @@ const NAV_MODULES = [
         desc: "Intelligence layer",
         badge: "AI",
         section: "modules",
+        path: "/business-brain",
     },
     {
         id: "growth-planner",
@@ -30,6 +31,7 @@ const NAV_MODULES = [
         desc: "Weekly AI calendar",
         badge: "New",
         section: "modules",
+        path: "/growth-planner",
     },
     {
         id: "caption-studio",
@@ -37,6 +39,7 @@ const NAV_MODULES = [
         name: "Caption Studio",
         desc: "AI content generator",
         section: "modules",
+        path: "/caption-studio",
     },
     {
         id: "social-autopilot",
@@ -44,6 +47,7 @@ const NAV_MODULES = [
         name: "Social Autopilot",
         desc: "Schedule & automate",
         section: "modules",
+        path: "/social-autopilot",
     },
     {
         id: "festival-radar",
@@ -52,6 +56,7 @@ const NAV_MODULES = [
         desc: "Trend & occasion intel",
         badge: "Live",
         section: "modules",
+        path: "/festival-radar",
     },
     {
         id: "ad-engine",
@@ -59,6 +64,7 @@ const NAV_MODULES = [
         name: "Ad Engine",
         desc: "Mock ad recommendations",
         section: "modules",
+        path: "/ad-engine",
     },
     {
         id: "performance",
@@ -66,6 +72,7 @@ const NAV_MODULES = [
         name: "Performance",
         desc: "Analytics dashboard",
         section: "modules",
+        path: "/performance",
     },
     {
         id: "chat",
@@ -73,102 +80,20 @@ const NAV_MODULES = [
         name: "AI Assistant",
         desc: "Ask anything",
         section: "workspace",
+        path: "/chat",
     },
 ];
-
-/* ══════════════════════════════════════════
-   MODULE CONTENT DEFINITIONS
-══════════════════════════════════════════ */
-const MODULE_CONTENT = {
-    "business-brain": {
-        tag: "Module 01",
-        title: "Business Brain",
-        desc: "Feed your business details once. AI builds a complete intelligence profile — audience personas, competitor gaps, seasonal demand patterns, and market positioning.",
-        cards: [
-            { icon: "🌐", title: "Website Analyzer", desc: "Paste your URL — AI extracts brand voice, products, and audience signals in 90 seconds.", badge: "AI" },
-            { icon: "👥", title: "Audience Personas", desc: "Generates 3–5 detailed buyer personas with buying intent and pain points.", badge: "AI" },
-            { icon: "🔍", title: "Competitor Map", desc: "Identifies 5 top competitors and surfaces content gaps you can own.", badge: "AI" },
-            { icon: "📈", title: "Market Signals", desc: "Tracks seasonal demand, trending topics, and emerging opportunities in your sector.", badge: "Live" },
-        ],
-    },
-    "growth-planner": {
-        tag: "Module 02",
-        title: "Weekly Growth Planner",
-        desc: "Input your goals for the week. AI cross-references festivals, industry trends, and past performance to build a 7-day execution calendar with themes, timings, and post types.",
-        cards: [
-            { icon: "🗓️", title: "7-Day Calendar", desc: "Auto-generates full week plan with content pillars, platform, and optimal timing.", badge: "AI" },
-            { icon: "🎪", title: "Festival Awareness", desc: "Integrates Diwali, Holi, Independence Day, and 200+ occasions into your strategy.", badge: "" },
-            { icon: "📌", title: "Goal Alignment", desc: "Maps each post to a weekly business objective — leads, awareness, or conversions.", badge: "" },
-            { icon: "🔁", title: "Evergreen Recycler", desc: "Re-queues high-performing past content at optimal intervals.", badge: "New" },
-        ],
-    },
-    "caption-studio": {
-        tag: "Module 03",
-        title: "Caption Studio",
-        desc: "Paste a product description. Get 3–5 caption variations per platform, each with hashtags, CTAs, and brand-tone consistency. Run A/B tests directly from here.",
-        cards: [
-            { icon: "✨", title: "3-Variant Generator", desc: "Produces casual, professional, and emotional caption variants simultaneously.", badge: "AI" },
-            { icon: "#️⃣", title: "Smart Hashtags", desc: "Generates platform-specific hashtag sets ranked by reach and relevance.", badge: "AI" },
-            { icon: "🎨", title: "Tone Matching", desc: "Learns your brand voice from past captions and stays consistent across posts.", badge: "" },
-            { icon: "🧪", title: "A/B Testing", desc: "Schedule two variants — system picks the winner by engagement after 24h.", badge: "New" },
-        ],
-    },
-    "social-autopilot": {
-        tag: "Module 04",
-        title: "Social Autopilot",
-        desc: "Connect Instagram, LinkedIn, Facebook, and X. The system schedules, publishes, monitors, and sends you a daily digest — all without manual work.",
-        cards: [
-            { icon: "🤖", title: "Auto-Scheduler", desc: "Posts at peak audience activity windows — different per platform, per audience.", badge: "" },
-            { icon: "💬", title: "Smart Replies", desc: "Auto-responds to common comments with branded templates you approve once.", badge: "AI" },
-            { icon: "📬", title: "Daily Digest", desc: "WhatsApp / email summary: what posted, what performed, what to do next.", badge: "" },
-            { icon: "🔗", title: "Platform Connect", desc: "Instagram · LinkedIn · Facebook · X/Twitter — one-click OAuth connection.", badge: "" },
-        ],
-    },
-    "festival-radar": {
-        tag: "Module 05",
-        title: "Festival Radar",
-        desc: "Never miss a revenue opportunity. The system scans 30 days ahead, identifies relevant festivals and occasions, and pre-generates campaign ideas tied to your business.",
-        cards: [
-            { icon: "📡", title: "30-Day Outlook", desc: "Live calendar of upcoming occasions with relevance score for your business category.", badge: "Live" },
-            { icon: "🇮🇳", title: "India-First", desc: "Covers 200+ Indian festivals, regional holidays, and awareness days.", badge: "" },
-            { icon: "💡", title: "Campaign Ideas", desc: "Auto-generates 3 campaign concepts per upcoming occasion with ad copy.", badge: "AI" },
-            { icon: "🎨", title: "Creative Templates", desc: "Pre-built festival poster templates with dynamic text overlay slots.", badge: "" },
-        ],
-    },
-    "ad-engine": {
-        tag: "Module 06",
-        title: "Ad Engine",
-        desc: "Simulated ad intelligence dashboard. Input your goal and budget — AI generates targeting recommendations, ad copy variants, and projected performance outcomes.",
-        cards: [
-            { icon: "🎯", title: "Audience Builder", desc: "Constructs interest + demographic targeting sets based on your business profile.", badge: "AI" },
-            { icon: "📝", title: "Copy Variants", desc: "Generates 3–5 ad headlines and descriptions for each campaign objective.", badge: "AI" },
-            { icon: "💰", title: "Budget Optimizer", desc: "Recommends how to split budget across platforms for best projected ROAS.", badge: "" },
-            { icon: "⚙️", title: "Mock Dashboard", desc: "Simulated CTR, CPC, CPL, and ROAS data with AI-generated optimization insights.", badge: "" },
-        ],
-    },
-    performance: {
-        tag: "Module 07",
-        title: "Performance Dashboard",
-        desc: "A unified analytics view across all your content and campaigns. See what's working, what's not, and get AI-generated recommendations for what to do next.",
-        cards: [
-            { icon: "📊", title: "Engagement Metrics", desc: "Likes, comments, shares, reach, and save rates across all platforms.", badge: "" },
-            { icon: "🏆", title: "Top Performers", desc: "Automatically surfaces your best-performing posts and campaign elements.", badge: "" },
-            { icon: "🔔", title: "Smart Alerts", desc: "Notifies you when a post outperforms average by 2× — or underperforms.", badge: "Live" },
-            { icon: "📋", title: "AI Insights", desc: "Weekly AI summary: what drove growth, what to double down on, what to drop.", badge: "AI" },
-        ],
-    },
-};
 
 /* ══════════════════════════════════════════
    HERO QUICK-START CARDS
 ══════════════════════════════════════════ */
 const HERO_CARDS = [
-    { icon: "🧠", title: "Business Brain", desc: "Analyze your business in 2 min", id: "business-brain" },
-    { icon: "📅", title: "Plan This Week", desc: "AI-generated 7-day calendar", id: "growth-planner" },
-    { icon: "✍️", title: "Write Captions", desc: "3 variants + hashtags instantly", id: "caption-studio" },
-    { icon: "📊", title: "View Analytics", desc: "Performance at a glance", id: "performance" },
-    { icon: "🎯", title: "Festival Radar", desc: "Upcoming campaign opportunities", id: "festival-radar" },
-    { icon: "⚡", title: "Ad Engine", desc: "Mock ad recommendations", id: "ad-engine" },
+    { icon: "🧠", title: "Business Brain", desc: "Analyze your business in 2 min", path: "/business-brain" },
+    { icon: "📅", title: "Plan This Week", desc: "AI-generated 7-day calendar", path: "/growth-planner" },
+    { icon: "✍️", title: "Write Captions", desc: "3 variants + hashtags instantly", path: "/caption-studio" },
+    { icon: "📊", title: "View Analytics", desc: "Performance at a glance", path: "/performance" },
+    { icon: "🎯", title: "Festival Radar", desc: "Upcoming campaign opportunities", path: "/festival-radar" },
+    { icon: "⚡", title: "Ad Engine", desc: "Mock ad recommendations", path: "/ad-engine" },
 ];
 
 /* ══════════════════════════════════════════
@@ -178,7 +103,6 @@ function GrowthIllustration() {
     return (
         <div className="growth-canvas" aria-hidden>
             <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Rising bars */}
                 <rect x="30" y="280" width="40" height="80" rx="6" fill="#F4622A" opacity="0.6">
                     <animate attributeName="height" values="0;80" dur="1.2s" fill="freeze" />
                     <animate attributeName="y" values="360;280" dur="1.2s" fill="freeze" />
@@ -199,18 +123,15 @@ function GrowthIllustration() {
                     <animate attributeName="height" values="0;300" dur="1.2s" begin="0.6s" fill="freeze" />
                     <animate attributeName="y" values="360;60" dur="1.2s" begin="0.6s" fill="freeze" />
                 </rect>
-                {/* Trend line */}
                 <polyline points="50,280 110,220 170,170 230,110 290,60"
                     stroke="#F4622A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.4">
                     <animate attributeName="stroke-dasharray" from="0 500" to="500 0" dur="1.8s" begin="0.3s" fill="freeze" />
                 </polyline>
-                {/* Dots */}
                 {[[50, 280], [110, 220], [170, 170], [230, 110], [290, 60]].map(([cx, cy], i) => (
                     <circle key={i} cx={cx} cy={cy} r="6" fill="#F4622A" opacity="0.9">
                         <animate attributeName="r" values="0;6" dur="0.3s" begin={`${0.9 + i * 0.1}s`} fill="freeze" />
                     </circle>
                 ))}
-                {/* Grid lines */}
                 {[100, 200, 300].map(y => (
                     <line key={y} x1="20" y1={y} x2="340" y2={y} stroke="#F4622A" strokeWidth="0.5" opacity="0.15" strokeDasharray="4 4" />
                 ))}
@@ -220,37 +141,7 @@ function GrowthIllustration() {
 }
 
 /* ══════════════════════════════════════════
-   MODULE PANEL
-══════════════════════════════════════════ */
-function ModulePanel({ moduleId, onNavigate }) {
-    const data = MODULE_CONTENT[moduleId];
-    if (!data) return null;
-    return (
-        <div className="module-panel">
-            <div className="module-header">
-                <div className="module-tag">
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5" /></svg>
-                    {data.tag}
-                </div>
-                <h2 className="module-title">{data.title}</h2>
-                <p className="module-desc">{data.desc}</p>
-            </div>
-            <div className="module-grid">
-                {data.cards.map((c, i) => (
-                    <div className="module-card" key={i}>
-                        <div className="mc-icon" style={{ fontSize: 20 }}>{c.icon}</div>
-                        <div className="mc-title">{c.title}</div>
-                        <div className="mc-desc">{c.desc}</div>
-                        {c.badge && <span className={`mc-badge${c.badge === "AI" || c.badge === "New" ? " new" : ""}`}>{c.badge}</span>}
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-}
-
-/* ══════════════════════════════════════════
-   CHAT PANEL
+   CHAT PANEL  (only used on /chat inside Home if you keep it here)
 ══════════════════════════════════════════ */
 function ChatPanel({ messages, loading, bottomRef }) {
     return (
@@ -286,7 +177,8 @@ function ChatPanel({ messages, loading, bottomRef }) {
    MAIN HOME COMPONENT
 ══════════════════════════════════════════ */
 export default function Home() {
-    const [activeModule, setActiveModule] = useState("home");
+    const navigate = useNavigate();
+
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [showAuth, setShowAuth] = useState(false);
@@ -315,14 +207,13 @@ export default function Home() {
         setMessages((prev) => [...prev, { role: "user", content: msg }]);
         setInputVal("");
         setLoading(true);
-        if (activeModule !== "chat") setActiveModule("chat");
         await new Promise((r) => setTimeout(r, 1200));
         setMessages((prev) => [
             ...prev,
             { role: "assistant", content: "This is a placeholder response from Growth OS. Connect your AI backend (Gemini/Claude API) to get real intelligent responses tailored to your business." },
         ]);
         setLoading(false);
-    }, [inputVal, activeModule]);
+    }, [inputVal]);
 
     const handleKey = (e) => {
         if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
@@ -330,7 +221,12 @@ export default function Home() {
 
     const toggleRecording = () => setIsRecording((p) => !p);
 
-    // Filter nav items by search
+    // Sidebar click → full page navigation
+    const handleNavClick = (item) => {
+        navigate(item.path);
+    };
+
+    // Filter nav by search
     const filteredNav = searchQuery.trim()
         ? NAV_MODULES.filter(
             (m) =>
@@ -342,17 +238,7 @@ export default function Home() {
     const sections = ["workspace", "modules"];
     const sectionLabels = { workspace: "Workspace", modules: "AI Modules" };
 
-    // Active module label for breadcrumb
-    const activeItem = NAV_MODULES.find((m) => m.id === activeModule);
-
-    // Placeholder for which panel to show
-    const showChat = activeModule === "chat" || messages.length > 0;
-    const showHero = activeModule === "home";
-    const showModule = MODULE_CONTENT[activeModule] !== undefined;
-
-    // Context tag text for input
-    const contextLabel = activeItem ? activeItem.name : "Growth OS";
-    const contextIcon = activeItem ? activeItem.icon : "🚀";
+    const showChat = messages.length > 0;
 
     return (
         <>
@@ -405,11 +291,9 @@ export default function Home() {
                                     {items.map((item) => (
                                         <div
                                             key={item.id}
-                                            className={`nav-item${activeModule === item.id ? " active" : ""}`}
-                                            onClick={() => {
-                                                setActiveModule(item.id);
-                                                // If switching away from chat, preserve messages but show module
-                                            }}
+                                            className="nav-item"
+                                            onClick={() => handleNavClick(item)}
+                                            style={{ cursor: "pointer" }}
                                         >
                                             <div className="nav-item-icon">{item.icon}</div>
                                             <div className="nav-item-text">
@@ -417,9 +301,7 @@ export default function Home() {
                                                 <div className="desc">{item.desc}</div>
                                             </div>
                                             {item.badge && (
-                                                <span className={`nav-badge${item.badge === "New" || item.badge === "Live" ? "" : ""}`}>
-                                                    {item.badge}
-                                                </span>
+                                                <span className="nav-badge">{item.badge}</span>
                                             )}
                                         </div>
                                     ))}
@@ -453,11 +335,10 @@ export default function Home() {
                         <div className="topbar-breadcrumb">
                             <span>Growth OS</span>
                             <span className="sep">/</span>
-                            <span className="current">{activeItem?.name || "Home"}</span>
+                            <span className="current">Home</span>
                         </div>
 
                         <div className="topbar-actions">
-                            {/* Theme / share */}
                             <button className="topbar-icon-btn" title="Share">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
@@ -478,27 +359,18 @@ export default function Home() {
 
                     {/* Content */}
                     <div className="gos-content">
-                        {/* Home / Hero */}
-                        {showHero && !showChat && (
+                        {/* Hero — always shown on home unless chat is active */}
+                        {!showChat && (
                             <div className="hero-wrap">
                                 <GrowthIllustration />
-
                                 <div className="hero-top">
-                                    {/* <div className="hero-eyebrow">
-                                        <span className="pulse-dot" />
-                                        Autonomous Growth Operating System
-                                    </div> */}
-
                                     <h1 className="hero-title">
                                         Your business,<br />
                                         <em>always growing.</em>
-                                        {/* <span className="line2">Zero social media manager needed.</span> */}
                                     </h1>
-
                                     <p className="hero-desc">
                                         AI that understands your business, plans your week, writes your captions, schedules your posts, and optimises your ads — all while you focus on what matters.
                                     </p>
-
                                     <div className="hero-stats">
                                         <div className="hero-stat"><span className="num">7×</span><span className="lbl">faster content</span></div>
                                         <div className="hero-stat-div" />
@@ -507,12 +379,13 @@ export default function Home() {
                                         <div className="hero-stat"><span className="num">50M+</span><span className="lbl">SMEs in India</span></div>
                                     </div>
 
+                                    {/* Hero cards — click navigates to full page */}
                                     <div className="hero-cards">
                                         {HERO_CARDS.map((c) => (
                                             <div
                                                 className="hero-card"
-                                                key={c.id}
-                                                onClick={() => setActiveModule(c.id)}
+                                                key={c.path}
+                                                onClick={() => navigate(c.path)}
                                             >
                                                 <div className="hc-icon">{c.icon}</div>
                                                 <div className="hc-title">{c.title}</div>
@@ -524,13 +397,7 @@ export default function Home() {
                             </div>
                         )}
 
-                        {/* Module Panel */}
-                        {activeModule === "business-brain" && !showChat && <BusinessBrain />}
-                        {showModule && activeModule !== "business-brain" && !showChat && (
-                            <ModulePanel moduleId={activeModule} onNavigate={setActiveModule} />
-                        )}
-
-                        {/* Chat view */}
+                        {/* Chat — only shown after user sends a message from Home */}
                         {showChat && (
                             <ChatPanel messages={messages} loading={loading} bottomRef={bottomRef} />
                         )}
@@ -540,10 +407,9 @@ export default function Home() {
                     <div className="gos-input-bar">
                         <div className="input-container">
                             <div className="input-top-row">
-                                {/* Context tag */}
                                 <div className="input-context-tag">
-                                    <span style={{ fontSize: 12 }}>{contextIcon}</span>
-                                    {contextLabel}
+                                    <span style={{ fontSize: 12 }}>🚀</span>
+                                    Growth OS
                                 </div>
 
                                 <textarea
@@ -552,7 +418,7 @@ export default function Home() {
                                     value={inputVal}
                                     onChange={(e) => setInputVal(e.target.value)}
                                     onKeyDown={handleKey}
-                                    placeholder={`Ask ${contextLabel} anything…`}
+                                    placeholder="Ask Growth OS anything…"
                                     rows={1}
                                 />
 
@@ -568,7 +434,6 @@ export default function Home() {
                             </div>
 
                             <div className="input-bottom-row">
-                                {/* Audio */}
                                 {isRecording ? (
                                     <button className="input-pill-btn" onClick={toggleRecording}>
                                         <div className="audio-dot" />
@@ -584,7 +449,11 @@ export default function Home() {
                                     </button>
                                 )}
 
-                                <button className="input-pill-btn" title="New conversation" onClick={() => { setMessages([]); setActiveModule("home"); }}>
+                                <button
+                                    className="input-pill-btn"
+                                    title="New conversation"
+                                    onClick={() => { setMessages([]); }}
+                                >
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
                                     </svg>
