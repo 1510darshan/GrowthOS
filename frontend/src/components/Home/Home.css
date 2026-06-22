@@ -36,7 +36,7 @@ body {
   background: var(--surface);
   color: var(--text-primary);
   line-height: 1.6;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 /* ═══════════════════════════════════════════
